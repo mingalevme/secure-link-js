@@ -12,8 +12,12 @@
     "test": "env TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\" }' mocha -r ts-node/register 'test/**/*.ts'",
     "all": "npm run build && npm run format && npm run lint && npm run package && npm test"
   },
-  "author": "",
-  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mingalevme/secure-link-js"
+  },
+  "author": "Mikhail Mingalev",
+  "license": "MIT",
   "devDependencies": {
     "@types/mocha": "^9.0.0",
     "@types/node": "^16.11.11",
