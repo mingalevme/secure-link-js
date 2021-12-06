@@ -20,31 +20,25 @@ export class StaticSignatureHasher implements Hasher {
   }
 }
 
-describe("signing test", function () {
+describe("secure link", function () {
   it("should sign an expiring link", () => {
     const hasher = new StaticSignatureHasher("foobar");
     const service = new SecureLink("secret", hasher, "_sig", "_expires");
-    const url = new URL(
-      "/path/to/resource?foo=bar&bar=foo",
-      "https://example.com"
-    );
+    const url = new URL("https://example.com/path/to/resource?foo=bar&bar=foo");
     service.sign(url, 1000);
     assert.strictEqual(
       url.toString(),
-      "https://example.com/path/to/resource?bar=foo&foo=bar&_expires=1000&_sig=foobar"
+      "https://example.com/path/to/resource?foo=bar&bar=foo&_expires=1000&_sig=foobar"
     );
   });
   it("should sign a non-expiring link", () => {
     const hasher = new StaticSignatureHasher("foobar");
     const service = new SecureLink("secret", hasher, "_sig", "_expires");
-    const url = new URL(
-      "/path/to/resource?foo=bar&bar=foo",
-      "https://example.com"
-    );
+    const url = new URL("https://example.com/path/to/resource?foo=bar&bar=foo");
     service.sign(url);
     assert.strictEqual(
       url.toString(),
-      "https://example.com/path/to/resource?bar=foo&foo=bar&_sig=foobar"
+      "https://example.com/path/to/resource?foo=bar&bar=foo&_sig=foobar"
     );
     assert.strictEqual(service.isValid(url), true);
   });
@@ -153,6 +147,53 @@ describe("sha1 hasher", function () {
     assert.strictEqual(
       hasher.isValid("8e2ad3b8e7ee8cdf34d66b120fae70625ab1a4ae", "secret"),
       false
+    );
+  });
+});
+
+describe("secure link + hashers", function () {
+  const md5Hasher = new Md5Hasher();
+  const sha1Hasher = new Sha1Hasher();
+  const dataset = [md5Hasher, sha1Hasher];
+  dataset.forEach(function (hasher: Hasher) {
+    it("should work correctly with hasher: " + hasher.constructor.name, () => {
+      const now = new DateNow(new Date(0));
+      const service = new SecureLink("secret", hasher, "_sig", "_expires", now);
+      const hash = hasher.hash(
+        "/path/to/resource?bar=foo&foo=bar&_expires=1 secret"
+      );
+      const url = new URL(
+        `https://example.com/path/to/resource?bar=foo&foo=bar`
+      );
+      service.sign(url, 1);
+      assert.strictEqual(
+        url.toString(),
+        `https://example.com/path/to/resource?bar=foo&foo=bar&_expires=1&_sig=${hash}`
+      );
+      assert.strictEqual(service.isValid(url), true);
+      service.validate(url);
+    });
+
+    it(
+      "should trigger invalid signature error with hasher: " +
+        hasher.constructor.name,
+      () => {
+        const now = new DateNow(new Date(0));
+        const service = new SecureLink(
+          "secret",
+          hasher,
+          "_sig",
+          "_expires",
+          now
+        );
+        const url = new URL(
+          `https://example.com/path/to/resource?bar=foo&foo=bar`
+        );
+        assert.strictEqual(service.isValid(url), false);
+        assert.throws(() => {
+          service.validate(url);
+        }, InvalidSignatureError);
+      }
     );
   });
 });

@@ -1,5 +1,6 @@
 import { Hasher } from "./hashing";
 import { DateNow, Now } from "./now";
+import { URL } from "url";
 
 export class SecureLink {
   private readonly secret: string;
@@ -23,13 +24,13 @@ export class SecureLink {
   }
 
   sign(url: URL, expiresAt?: number): void {
-    url.searchParams.sort();
     if (expiresAt) {
-      // Add expiration to end of the qs
-      url.searchParams.append(this.expiresArg, expiresAt.toString());
+      url.searchParams.delete(this.expiresArg);
+      url.searchParams.set(this.expiresArg, expiresAt.toString());
     }
     const signature = this.hasher.hash(this.getDataToSign(url));
-    url.searchParams.append(this.signatureArg, signature);
+    url.searchParams.delete(this.signatureArg);
+    url.searchParams.set(this.signatureArg, signature);
   }
 
   /**
@@ -48,7 +49,7 @@ export class SecureLink {
       return;
     }
     const expires = +url.searchParams.get(this.expiresArg);
-    if (isNaN(+expires)) {
+    if (isNaN(expires)) {
       throw new LinkHasExpiredError();
     }
     if (expires < Math.round(this.now.now().getTime() / 1000)) {
@@ -66,7 +67,9 @@ export class SecureLink {
   }
 
   private getDataToSign(url: URL): string {
-    return `${url.pathname}${url.search} ${this.secret}`;
+    const anotherUrl = new URL(url.toString());
+    anotherUrl.searchParams.delete(this.signatureArg);
+    return `${anotherUrl.pathname}${anotherUrl.search} ${this.secret}`;
   }
 }
 
