@@ -1,3 +1,7 @@
+# Editors
+.idea
+*.iml
+
 # Logs
 logs
 *.log
