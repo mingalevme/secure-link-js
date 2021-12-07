@@ -1,8 +1,8 @@
 import { describe, it } from "mocha";
 import { strict as assert } from "assert";
 import { InvalidSignatureError, LinkHasExpiredError, SecureLink } from "../src";
-import { Hasher, Md5Hasher, Sha1Hasher } from "../src/hashing";
-import { DateNow } from "../src/now";
+import { Hasher, Md5Hasher, Sha1Hasher } from "../src";
+import { DateNow } from "../src";
 
 export class StaticSignatureHasher implements Hasher {
   private readonly signature: string;
@@ -103,6 +103,36 @@ describe("secure link", function () {
     assert.throws(() => {
       service.validate(url);
     }, LinkHasExpiredError);
+  });
+  it("should not change link", () => {
+    const hasher = new StaticSignatureHasher("foobar");
+    const service = new SecureLink("secret", hasher, "_sig", "_expires", new DateNow(new Date(0)));
+    const url1 = new URL(
+        `https://example.com/path/to/resource?url=https://github.com&foo=bar&bar&_expires=1`
+    );
+    service.sign(url1);
+    assert.strictEqual(
+        url1.toString(),
+        "https://example.com/path/to/resource?url=https://github.com&foo=bar&bar&_expires=1&_sig=foobar"
+    );
+    assert.strictEqual(service.isValid(url1), true);
+    assert.strictEqual(
+        url1.toString(),
+        "https://example.com/path/to/resource?url=https://github.com&foo=bar&bar&_expires=1&_sig=foobar"
+    );
+    const url2 = new URL(
+        `https://example.com/path/to/resource?url=https%3A%2F%2Fgithub.com&foo=bar&bar&_expires=1`
+    );
+    service.sign(url2);
+    assert.strictEqual(
+        url2.toString(),
+        "https://example.com/path/to/resource?url=https%3A%2F%2Fgithub.com&foo=bar&bar&_expires=1&_sig=foobar"
+    );
+    assert.strictEqual(service.isValid(url2), true);
+    assert.strictEqual(
+        url2.toString(),
+        "https://example.com/path/to/resource?url=https%3A%2F%2Fgithub.com&foo=bar&bar&_expires=1&_sig=foobar"
+    );
   });
 });
 
