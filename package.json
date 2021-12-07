@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "Signs links with query strings",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
     "format": "prettier --write '**/*.ts'",
@@ -10,7 +11,8 @@
     "lint": "eslint src/**/*.ts",
     "package": "ncc build --source-map --license LICENSE",
     "test": "env TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\" }' mocha -r ts-node/register 'test/**/*.ts'",
-    "all": "npm run build && npm run format && npm run lint && npm run package && npm test"
+    "all": "npm run build && npm run format && npm run lint && npm run package && npm test",
+    "prepublish": "npm test"
   },
   "repository": {
     "type": "git",

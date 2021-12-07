@@ -3,10 +3,10 @@ export interface Now {
 }
 
 export class DateNow implements Now {
-  private readonly date: Date;
+  private readonly date: Date | null;
 
   constructor(date?: Date) {
-    this.date = date;
+    this.date = date || null;
   }
 
   now(): Date {
