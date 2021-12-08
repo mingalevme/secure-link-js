@@ -11,8 +11,7 @@
     "lint": "eslint src/**/*.ts",
     "package": "ncc build --source-map --license LICENSE",
     "test": "env TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\" }' mocha -r ts-node/register 'test/**/*.ts'",
-    "all": "npm run build && npm run format && npm run lint && npm run package && npm test",
-    "prepublish": "npm test"
+    "all": "npm run build && npm run format && npm run lint && npm run package && npm test"
   },
   "repository": {
     "type": "git",

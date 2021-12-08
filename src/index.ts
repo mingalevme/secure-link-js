@@ -1,5 +1,6 @@
 import { Hasher, Md5Hasher, Sha1Hasher } from "./hashing";
 import { DateNow, Now } from "./now";
+import { stringify as queryStringStringify } from "querystring";
 
 export class SecureLink {
   private readonly secret: string;
@@ -23,9 +24,8 @@ export class SecureLink {
   }
 
   sign(url: URL, expiresAt?: number): void {
-    const querystring = require("querystring");
     if (expiresAt) {
-      const expiresAtQueryParam = querystring.stringify({
+      const expiresAtQueryParam = queryStringStringify({
         [this.expiresArg]: expiresAt.toString(),
       });
       url.search = url.search
@@ -33,7 +33,7 @@ export class SecureLink {
         : expiresAtQueryParam;
     }
     const signature = this.hasher.hash(this.getDataToSign(url));
-    const signatureQueryParam = querystring.stringify({
+    const signatureQueryParam = queryStringStringify({
       [this.signatureArg]: signature,
     });
     url.search = url.search
