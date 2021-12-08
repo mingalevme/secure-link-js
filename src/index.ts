@@ -23,15 +23,22 @@ export class SecureLink {
   }
 
   sign(url: URL, expiresAt?: number): void {
+    const querystring = require("querystring");
     if (expiresAt) {
+      const expiresAtQueryParam = querystring.stringify({
+        [this.expiresArg]: expiresAt.toString(),
+      });
       url.search = url.search
-        ? `${url.search}&${this.expiresArg}=${expiresAt.toString()}`
-        : `${this.expiresArg}=${expiresAt.toString()}`;
+        ? `${url.search}&${expiresAtQueryParam}`
+        : expiresAtQueryParam;
     }
     const signature = this.hasher.hash(this.getDataToSign(url));
+    const signatureQueryParam = querystring.stringify({
+      [this.signatureArg]: signature,
+    });
     url.search = url.search
-      ? `${url.search}&${this.signatureArg}=${signature}`
-      : `${this.signatureArg}=${signature}`;
+      ? `${url.search}&${signatureQueryParam}`
+      : signatureQueryParam;
   }
 
   /**

@@ -106,32 +106,38 @@ describe("secure link", function () {
   });
   it("should not change link", () => {
     const hasher = new StaticSignatureHasher("foobar");
-    const service = new SecureLink("secret", hasher, "_sig", "_expires", new DateNow(new Date(0)));
+    const service = new SecureLink(
+      "secret",
+      hasher,
+      "_sig",
+      "_expires",
+      new DateNow(new Date(0))
+    );
     const url1 = new URL(
-        `https://example.com/path/to/resource?url=https://github.com&foo=bar&bar&_expires=1`
+      `https://example.com/path/to/resource?url=https://github.com&foo=bar&bar&_expires=1`
     );
     service.sign(url1);
     assert.strictEqual(
-        url1.toString(),
-        "https://example.com/path/to/resource?url=https://github.com&foo=bar&bar&_expires=1&_sig=foobar"
+      url1.toString(),
+      "https://example.com/path/to/resource?url=https://github.com&foo=bar&bar&_expires=1&_sig=foobar"
     );
     assert.strictEqual(service.isValid(url1), true);
     assert.strictEqual(
-        url1.toString(),
-        "https://example.com/path/to/resource?url=https://github.com&foo=bar&bar&_expires=1&_sig=foobar"
+      url1.toString(),
+      "https://example.com/path/to/resource?url=https://github.com&foo=bar&bar&_expires=1&_sig=foobar"
     );
     const url2 = new URL(
-        `https://example.com/path/to/resource?url=https%3A%2F%2Fgithub.com&foo=bar&bar&_expires=1`
+      `https://example.com/path/to/resource?url=https%3A%2F%2Fgithub.com&foo=bar&bar&_expires=1`
     );
     service.sign(url2);
     assert.strictEqual(
-        url2.toString(),
-        "https://example.com/path/to/resource?url=https%3A%2F%2Fgithub.com&foo=bar&bar&_expires=1&_sig=foobar"
+      url2.toString(),
+      "https://example.com/path/to/resource?url=https%3A%2F%2Fgithub.com&foo=bar&bar&_expires=1&_sig=foobar"
     );
     assert.strictEqual(service.isValid(url2), true);
     assert.strictEqual(
-        url2.toString(),
-        "https://example.com/path/to/resource?url=https%3A%2F%2Fgithub.com&foo=bar&bar&_expires=1&_sig=foobar"
+      url2.toString(),
+      "https://example.com/path/to/resource?url=https%3A%2F%2Fgithub.com&foo=bar&bar&_expires=1&_sig=foobar"
     );
   });
 });
