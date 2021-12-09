@@ -58,7 +58,7 @@ try {
         console.log('Link is valid', url.toString())
     }
 }
-// Console: "Signature is invalid" "https://github.com/mingalevme/secure-link-js?_expires=9999…_expires=1000000000&_sig=456d33904ef4017646827d17396c11ef"
+// Console: "Link is expired" "https://github.com/mingalevme/secure-link-js?_expires=1000000000&_sig=f8ba8b5fa6af187364aa56dd95d6ba01"
 ```
 
 ## Signing a link without the library
