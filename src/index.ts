@@ -11,13 +11,13 @@ export class SecureLink {
 
   constructor(
     secret: string,
-    hasher: Hasher,
+    hasher?: Hasher,
     signatureArg?: string,
     expiresArg?: string,
     now?: Now
   ) {
     this.secret = secret;
-    this.hasher = hasher;
+    this.hasher = hasher || new Md5Hasher();
     this.signatureArg = signatureArg || "signature";
     this.expiresArg = expiresArg || "expires";
     this.now = now || new DateNow();

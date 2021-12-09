@@ -140,6 +140,15 @@ describe("secure link", function () {
       "https://example.com/path/to/resource?url=https%3A%2F%2Fgithub.com&foo=bar&bar&_expires=1&_sig=foobar"
     );
   });
+  it("should sign with default hasher", () => {
+    const service = new SecureLink('secret');
+    const url = new URL("https://example.com/path/to/resource?foo=bar&bar=foo");
+    service.sign(url);
+    assert.strictEqual(
+        url.toString(),
+        "https://example.com/path/to/resource?foo=bar&bar=foo&signature=b5f765bf5f8ec75250673fece5ebb104"
+    );
+  });
 });
 
 describe("md5 hasher", function () {
